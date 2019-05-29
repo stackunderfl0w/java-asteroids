@@ -23,7 +23,7 @@ public class Screen extends JPanel {
     double playerXVelocity;
     double playerYVelocity;
     double playerOrientaion;
-    int frames;
+    public int frames;
     public HashMap<Integer, Boolean> key=new HashMap<>();
     Random rand = new Random();
     private int[][] stars=new int[120][];
@@ -31,17 +31,27 @@ public class Screen extends JPanel {
     private static ArrayList<uielement> buttons=new ArrayList<>();
     uielement elementinfocus;
     private int x_location,y_location;
-    private boolean debug;
+    private ArrayList<missile>missiles=new ArrayList<>();
+    private ArrayList<asteroid>asteroids=new ArrayList<>();
+    private int cooldown;
+    int starting_asteroids=3;
 
     Screen(){
         Main.f.addKeyListener(new KeyAdapter() {
             public void keyPressed(KeyEvent e) {
                 key.put(e.getKeyCode(),true);
                 if(e.getKeyCode()==KeyEvent.VK_F){System.exit(0);}
-                if(e.getKeyCode()==KeyEvent.VK_ALT){debug=!debug;}
+                if(e.getKeyCode()==KeyEvent.VK_ALT){Main.debug=!Main.debug;}
+                if(e.getKeyCode()==KeyEvent.VK_Q){Main.framerate=300;}
+                if(e.getKeyCode()==KeyEvent.VK_0){Main.framerate=3000;}
+                if(e.getKeyCode()==KeyEvent.VK_9){Main.framerate=30000;}
             }
             public void keyReleased(KeyEvent e) {
                 key.put(e.getKeyCode(),false);
+                if(e.getKeyCode()==KeyEvent.VK_Q){Main.framerate=60;}
+                if(e.getKeyCode()==KeyEvent.VK_0){Main.framerate=60;}
+                if(e.getKeyCode()==KeyEvent.VK_9){Main.framerate=60;}
+
             }
         });
         addMouseListener(new MouseAdapter() {
@@ -89,8 +99,13 @@ public class Screen extends JPanel {
     private void startgame(){
         playerX=.5;
         playerY=.5;
+        for(int i=0; i<starting_asteroids; i++) {
+            asteroids.add(new asteroid(playerX + Math.sin(360.0 / i / Math.PI), playerY+ Math.cos(360.0 / i / Math.PI),360.0 / i / Math.PI ,3));
+        }
     }
     private void paintFullScreen() {
+        width=getWidth();
+        height=getHeight();
         if (start.wasclicked()){
             screen=1;
             startgame();
@@ -112,6 +127,9 @@ public class Screen extends JPanel {
             //new drawablestring(width/10*4,height/10*7,width/10*2,height/10,"Start",true).draw(g);
         }
         if (screen==1){
+            if(cooldown>0){
+                cooldown--;
+            }
             if(key.get(KeyEvent.VK_W)){
                 playerXVelocity+=Math.sin(playerOrientaion)/3000;
                 playerYVelocity+=Math.cos(playerOrientaion)/3000;
@@ -125,6 +143,10 @@ public class Screen extends JPanel {
             if(key.get(KeyEvent.VK_D)){
                 playerOrientaion=(playerOrientaion-.1)%360;
             }
+            if(key.get(KeyEvent.VK_SPACE)&&cooldown==0){
+                missiles.add(new missile(playerX,playerY,playerOrientaion,300));
+                cooldown=30;
+            }
             playerXVelocity=playerXVelocity*.97;
             playerYVelocity=playerYVelocity*.97;
             playerX=(playerX+playerXVelocity+1)%1;
@@ -137,7 +159,21 @@ public class Screen extends JPanel {
             g.drawLine((int)((width*playerX)+15*Math.sin(playerOrientaion)),(int)((height*playerY)+15*Math.cos(playerOrientaion)),(int)((width*playerX)+15*Math.sin(playerOrientaion-2.5)),(int)((height*playerY)+15*Math.cos(playerOrientaion-2.5)));
             g.drawLine((int)((width*playerX)+5*Math.sin(playerOrientaion+Math.PI)),(int)((height*playerY)+5*Math.cos(playerOrientaion+Math.PI)),(int)((width*playerX)+15*Math.sin(playerOrientaion+2.5)),(int)((height*playerY)+15*Math.cos(playerOrientaion+2.5)));
             g.drawLine((int)((width*playerX)+5*Math.sin(playerOrientaion+Math.PI)),(int)((height*playerY)+5*Math.cos(playerOrientaion+Math.PI)),(int)((width*playerX)+15*Math.sin(playerOrientaion-2.5)),(int)((height*playerY)+15*Math.cos(playerOrientaion-2.5)));
-            if(debug){
+            for (int i=0;i<missiles.size();i++){
+                missiles.get(i).draw(g,width,height);
+                if(missiles.get(i).getTime()<1){
+                    missiles.remove(i);
+                    i--;
+                }
+            }
+            for (int i=0;i<asteroids.size();i++){
+                asteroids.get(i).draw(g,width,height);
+                //if(missiles.get(i).getTime()<1){
+                 //   missiles.remove(i);
+                //    i--;
+                //}
+            }
+            if(Main.debug){
                 g.drawLine((int)((width*playerX)+15*Math.sin(playerOrientaion)),(int)((height*playerY)+15*Math.cos(playerOrientaion)),(int)((width*playerX)+50*Math.sin(playerOrientaion)),(int)((height*playerY)+50*Math.cos(playerOrientaion)));
                 g.drawRect((int)(width*playerX-10),(int)(height*playerY-10),20,20);
                 new drawablestring(0,0,100,50,Double.toString(round(playerX,2)),true).draw(g);
@@ -167,11 +203,56 @@ class missile{
     double missileXVelocity;
     double missileYVelocity;
     double missileOrientaion;
-    missile(double x, double y, double direction){
+    int time;
+    missile(double x, double y, double direction,int durration){
         missileX=x;
         missileY=y;
-        missileXVelocity=Math.sin(direction);
-        missileYVelocity=Math.cos(direction);
+        missileXVelocity=Math.sin(direction)/180;
+        missileYVelocity=Math.cos(direction)/180;
         missileOrientaion=direction;
+        time=durration;
+    }
+    void draw(Graphics g,int w, int h){
+        missileX=(missileX+missileXVelocity+1)%1;
+        missileY=(missileY+missileYVelocity+1)%1;
+        time--;
+        g.drawLine((int)((w*missileX)+10*Math.sin(missileOrientaion)),(int)((h*missileY)+10*Math.cos(missileOrientaion)),(int)((w*missileX)+10*Math.sin(missileOrientaion+2.5)),(int)((h*missileY)+10*Math.cos(missileOrientaion+2.5)));
+        g.drawLine((int)((w*missileX)+10*Math.sin(missileOrientaion)),(int)((h*missileY)+10*Math.cos(missileOrientaion)),(int)((w*missileX)+10*Math.sin(missileOrientaion-2.5)),(int)((h*missileY)+10*Math.cos(missileOrientaion-2.5)));
+        if (Main.debug){
+            g.drawRect((int)(w*missileX)-5,(int)(h*missileY)-5,10,10);
+            g.drawLine((int)((w*missileX)+15*Math.sin(missileOrientaion)),(int)((h*missileY)+15*Math.cos(missileOrientaion)),(int)((w*missileX)+50*Math.sin(missileOrientaion)),(int)((h*missileY)+50*Math.cos(missileOrientaion)));
+        }
+    }
+    int getTime(){
+        return time;
+    }
+}
+class asteroid{
+    double missileX;
+    double missileY;
+    double missileXVelocity;
+    double missileYVelocity;
+    double missileOrientaion;
+    int size;
+    asteroid(double x, double y, double direction,int s){
+        missileX=x;
+        missileY=y;
+        missileXVelocity=Math.sin(direction)/180;
+        missileYVelocity=Math.cos(direction)/180;
+        missileOrientaion=direction;
+        size=s;
+    }
+    void draw(Graphics g,int w, int h){
+        missileX=(missileX+missileXVelocity+1)%1;
+        missileY=(missileY+missileYVelocity+1)%1;
+        g.drawLine((int)((w*missileX)+10*Math.sin(missileOrientaion)),(int)((h*missileY)+10*Math.cos(missileOrientaion)),(int)((w*missileX)+10*Math.sin(missileOrientaion+2.5)),(int)((h*missileY)+10*Math.cos(missileOrientaion+2.5)));
+        g.drawLine((int)((w*missileX)+10*Math.sin(missileOrientaion)),(int)((h*missileY)+10*Math.cos(missileOrientaion)),(int)((w*missileX)+10*Math.sin(missileOrientaion-2.5)),(int)((h*missileY)+10*Math.cos(missileOrientaion-2.5)));
+        if (Main.debug){
+            g.drawRect((int)(w*missileX)-5,(int)(h*missileY)-5,10,10);
+            g.drawLine((int)((w*missileX)+15*Math.sin(missileOrientaion)),(int)((h*missileY)+15*Math.cos(missileOrientaion)),(int)((w*missileX)+50*Math.sin(missileOrientaion)),(int)((h*missileY)+50*Math.cos(missileOrientaion)));
+        }
+    }
+    int getS(){
+        return size;
     }
 }
