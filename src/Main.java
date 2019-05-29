@@ -2,11 +2,11 @@ import javax.swing.*;
 
 public class Main {
     private static long[] last_frame = new long[60];
-    public static long last_fps_update;
+    private static long last_fps_update;
     public static JFrame f = new JFrame();
     public static Screen screen;
-    public static int framerate=60;
-    public static long next_frame;
+    private static int framerate=60;
+    private static long next_frame;
 
     public static void main(String[] args) {
         f.setTitle("Stackunderfl0w java asteroids");

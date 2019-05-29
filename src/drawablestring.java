@@ -2,7 +2,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 
-public class drawablestring extends JPanel {
+public class drawablestring extends uielement{
     private int width;
     private int height;
     private int x_location;
@@ -13,7 +13,7 @@ public class drawablestring extends JPanel {
     private Font font=new Font("Arial", Font.BOLD, 96);
     private Color backgroundColor;
     private boolean drawBounds;
-    private Color fontColor=Color.black;
+    private Color fontColor=Color.white;
     drawablestring(int x, int y,int w, int h, String s,Boolean bounds){
         x_location=x;
         y_location=y;
@@ -120,9 +120,9 @@ public class drawablestring extends JPanel {
             g.fillRect(x_location,y_location,width,height);
         }
         g.setFont(font);
-        g.setColor(Color.black);
+        g.setColor(Color.white);
         if(drawBounds){
-            g.drawRect(x_location, y_location, width, height);
+            g.drawRoundRect(x_location, y_location, width, height,15,15);
         }
         g.setColor(fontColor);
         paint_string(g,string,x_location+width/2,y_location+height/2);
@@ -136,5 +136,29 @@ public class drawablestring extends JPanel {
         g.setColor(fontColor);
         g.drawString(s,x-w/2,y+h/2);
         //System.out.println("string" +s+" at " +x+","+y);
+    }
+    void clicked(int x,int y){
+
+    }
+    void updateposition(int x, int y, int w, int h){
+        x_location=x;
+        y_location=y;
+        width=w;
+        height=h;
+    }
+    int getwidth() {
+        return width;
+    }
+
+    int getheight() {
+        return height;
+    }
+
+    int gety() {
+        return y_location;
+    }
+
+    int getx() {
+        return x_location;
     }
 }

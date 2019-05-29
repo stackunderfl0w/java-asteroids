@@ -1,7 +1,7 @@
 import java.awt.*;
 import java.awt.event.KeyEvent;
 
-public class drawablebutton{
+public class drawablebutton extends uielement{
     private int width;
     private int height;
     private int x_location;
@@ -44,13 +44,24 @@ public class drawablebutton{
         clicked=true;
     }
     void updateposition(int x, int y, int w, int h){
-        x_location=x+xofset;
-        y_location=y+yofset;
-        if(xofset<0){
-            x_location+=w;
-        }
-        if(yofset<0){
-            y_location+=h;
-        }
+        x_location=x;
+        y_location=y;
+        width=w;
+        height=h;
+    }
+    int getwidth() {
+        return width;
+    }
+
+    int getheight() {
+        return height;
+    }
+
+    int gety() {
+        return y_location;
+    }
+
+    int getx() {
+        return x_location;
     }
 }
