@@ -184,7 +184,7 @@ public class Screen extends JPanel {
                         if (distance(missiles.get(o).missileX * width, missiles.get(o).missileY * height, asteroids.get(i).asteroidX * width, asteroids.get(i).asteroidY * height) < 20*asteroids.get(i).size) {
                             if(asteroids.get(i).size>1){
                                 for(int p=0; p<starting_asteroids; p++) {
-                                    addasteroids.add(new asteroid(asteroids.get(i).asteroidX, asteroids.get(i).asteroidY,2*Math.PI/starting_asteroids*p,asteroids.get(i).size-1));
+                                    addasteroids.add(new asteroid(asteroids.get(i).asteroidX, asteroids.get(i).asteroidY,2*Math.PI* rand.nextDouble() ,asteroids.get(i).size-1));
                                 }
                             }
                             asteroids.remove(i);
@@ -206,6 +206,17 @@ public class Screen extends JPanel {
                 new drawablestring(0,200,100,50,Double.toString(round(playerOrientaion,2)),true).draw(g);
                 new drawablestring(0,0,50,50,Integer.toString(asteroids.size()),Color.BLUE).draw(g);
             }
+            g.drawLine((int) ((width * .5) + 213.4759939665348 * Math.sin(2.876162296940873)),(int) ((height * .5) + 213.4759939665348 * Math.cos(2.876162296940873)),(int) ((width * .5) + 250.3517525403008 * Math.sin(2.33924696038594)),(int) ((height * .5) + 250.3517525403008 * Math.cos(2.33924696038594)));
+            g.drawLine((int) ((width * .5) + 250.3517525403008 * Math.sin(2.33924696038594)),(int) ((height * .5) + 250.3517525403008 * Math.cos(2.33924696038594)),(int) ((width * .5) + 325.55491088294156 * Math.sin(1.6291913991655185)),(int) ((height * .5) + 325.55491088294156 * Math.cos(1.6291913991655185)));
+            g.drawLine((int) ((width * .5) + 325.55491088294156 * Math.sin(1.6291913991655185)),(int) ((height * .5) + 325.55491088294156 * Math.cos(1.6291913991655185)),(int) ((width * .5) + 343.47052275268106 * Math.sin(1.0993363767339894)),(int) ((height * .5) + 343.47052275268106 * Math.cos(1.0993363767339894)));
+            g.drawLine((int) ((width * .5) + 343.47052275268106 * Math.sin(1.0993363767339894)),(int) ((height * .5) + 343.47052275268106 * Math.cos(1.0993363767339894)),(int) ((width * .5) + 257.84685377176896 * Math.sin(0.29108532346969357)),(int) ((height * .5) + 257.84685377176896 * Math.cos(0.29108532346969357)));
+            g.drawLine((int) ((width * .5) + 257.84685377176896 * Math.sin(0.29108532346969357)),(int) ((height * .5) + 257.84685377176896 * Math.cos(0.29108532346969357)),(int) ((width * .5) + 304.6112276328632 * Math.sin(-0.7250065733293457)),(int) ((height * .5) + 304.6112276328632 * Math.cos(-0.7250065733293457)));
+            g.drawLine((int) ((width * .5) + 304.6112276328632 * Math.sin(-0.7250065733293457)),(int) ((height * .5) + 304.6112276328632 * Math.cos(-0.7250065733293457)),(int) ((width * .5) + 329.24762717444145 * Math.sin(-1.1316003652922073)),(int) ((height * .5) + 329.24762717444145 * Math.cos(-1.1316003652922073)));
+            g.drawLine((int) ((width * .5) + 329.24762717444145 * Math.sin(-1.1316003652922073)),(int) ((height * .5) + 329.24762717444145 * Math.cos(-1.1316003652922073)),(int) ((width * .5) + 289.0830330545188 * Math.sin(-1.6573848302907026)),(int) ((height * .5) + 289.0830330545188 * Math.cos(-1.6573848302907026)));
+            g.drawLine((int) ((width * .5) + 289.0830330545188 * Math.sin(-1.6573848302907026)),(int) ((height * .5) + 289.0830330545188 * Math.cos(-1.6573848302907026)),(int) ((width * .5) + 258.1259382549534 * Math.sin(-2.0985919129864326)),(int) ((height * .5) + 258.1259382549534 * Math.cos(-2.0985919129864326)));
+            g.drawLine((int) ((width * .5) + 258.1259382549534 * Math.sin(-2.0985919129864326)),(int) ((height * .5) + 258.1259382549534 * Math.cos(-2.0985919129864326)),(int) ((width * .5) + 235.47611343828487 * Math.sin(-2.347185724901928)),(int) ((height * .5) + 235.47611343828487 * Math.cos(-2.347185724901928)));
+            g.drawLine((int) ((width * .5) + 235.47611343828487 * Math.sin(-2.347185724901928)),(int) ((height * .5) + 235.47611343828487 * Math.cos(-2.347185724901928)),(int) ((width * .5) + 208.47062143141417 * Math.sin(-2.9874845370243666)),(int) ((height * .5) + 208.47062143141417 * Math.cos(-2.9874845370243666)));
+            g.drawLine((int) ((width * .5) + 208.47062143141417 * Math.sin(-2.9874845370243666)),(int) ((height * .5) + 208.47062143141417 * Math.cos(-2.9874845370243666)),(int) ((width * .5) + 220.9660607423683 * Math.sin(2.908688046947808)),(int) ((height * .5) + 220.9660607423683 * Math.cos(2.908688046947808)));
 
         }
         //for(int i=0;i++<10;){
@@ -278,6 +289,9 @@ class asteroid{
         asteroidX=(asteroidX+asteroidXVelocity+1)%1;
         asteroidY=(asteroidY+asteroidYVelocity+1)%1;
         draw_circular(g,(int)(w*asteroidX),(int)(h*asteroidY),15*size,6+size);
+        g.drawLine((int)((w*asteroidX)+15*Math.sin(asteroidOrientaion)),(int)((h*asteroidY)+15*Math.cos(asteroidOrientaion)),(int)((w*asteroidX)+15*Math.sin(asteroidOrientaion+(1*Math.PI/3))),(int)((h*asteroidY)+15*Math.cos(asteroidOrientaion+(1*Math.PI/3))));
+
+
         /*g.drawLine((int)((w*asteroidX)+15*Math.sin(asteroidOrientaion)),(int)((h*asteroidY)+15*Math.cos(asteroidOrientaion)),(int)((w*asteroidX)+15*Math.sin(asteroidOrientaion+(1*Math.PI/3))),(int)((h*asteroidY)+15*Math.cos(asteroidOrientaion+(1*Math.PI/3))));
         g.drawLine((int)((w*asteroidX)+15*Math.sin(asteroidOrientaion+(1*Math.PI/3))),(int)((h*asteroidY)+15*Math.cos(asteroidOrientaion+(1*Math.PI/3))),(int)((w*asteroidX)+15*Math.sin(asteroidOrientaion+(2*Math.PI/3))),(int)((h*asteroidY)+15*Math.cos(asteroidOrientaion+(2*Math.PI/3))));
         g.drawLine((int)((w*asteroidX)+15*Math.sin(asteroidOrientaion+(2*Math.PI/3))),(int)((h*asteroidY)+15*Math.cos(asteroidOrientaion+(2*Math.PI/3))),(int)((w*asteroidX)+15*Math.sin(asteroidOrientaion+(3*Math.PI/3))),(int)((h*asteroidY)+15*Math.cos(asteroidOrientaion+(3*Math.PI/3))));
