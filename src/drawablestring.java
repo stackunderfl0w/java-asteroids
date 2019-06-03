@@ -106,13 +106,28 @@ public class drawablestring extends uielement{
             string_width=fm.stringWidth(s);
         }
     }
-    drawablestring(int x, int y,int w, int h, String s,Font f){
+    drawablestring(int x, int y,int w, int h, String s,Font f,int max){
         x_location=x;
         y_location=y;
         width=w;
         height=h;
         string=s;
         font=f;
+        fontsize=96;
+        int string_height=3000;
+        while(string_height>height||string_height>max){
+            fontsize--;
+            font=f.deriveFont(Font.PLAIN,fontsize);
+            FontMetrics fm=getFontMetrics(font);
+            string_height=fm.getHeight();
+        }
+        int string_width=3000;
+        while(string_width>width){
+            fontsize--;
+            font=f.deriveFont(Font.PLAIN,fontsize);
+            FontMetrics fm=getFontMetrics(font);
+            string_width=fm.stringWidth(s);
+        }
     }
     void draw(Graphics g){
         if (backgroundColor!=null){
@@ -121,7 +136,7 @@ public class drawablestring extends uielement{
         }
         g.setFont(font);
         g.setColor(Color.white);
-        if(drawBounds){
+        if(drawBounds|Main.debug){
             g.drawRoundRect(x_location, y_location, width, height,15,15);
         }
         g.setColor(fontColor);

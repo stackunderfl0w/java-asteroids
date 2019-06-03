@@ -5,6 +5,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -35,6 +36,8 @@ public class Screen extends JPanel {
     private ArrayList<asteroid>asteroids=new ArrayList<>();
     private int cooldown;
     int starting_asteroids=3;
+    private int score;
+    Font customFont;
 
     Screen(){
         Main.f.addKeyListener(new KeyAdapter() {
@@ -69,7 +72,18 @@ public class Screen extends JPanel {
         key.put(KeyEvent.VK_S,false);
         key.put(KeyEvent.VK_D,false);
         key.put(KeyEvent.VK_SPACE,false);
-
+        for( int i =0;i++<3;) {
+            asteroids.add(new asteroid(rand.nextInt(width), rand.nextInt(width), rand.nextDouble() * Math.PI, 3));
+        }
+        try {
+            //create the font to use. Specify the size!
+            customFont = Font.createFont(Font.TRUETYPE_FONT, new File("src\\fonts\\PressStart2P.ttf"));
+            GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+            //register the font
+            ge.registerFont(customFont);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
     }
     private void click(int x, int y){
@@ -97,10 +111,11 @@ public class Screen extends JPanel {
         paintFullScreen();
     }
     private void startgame(){
+        asteroids=new ArrayList<>();
         playerX=.5;
         playerY=.5;
         for(int i=0; i<starting_asteroids; i++) {
-            asteroids.add(new asteroid(playerX + .1*Math.sin(2*Math.PI/starting_asteroids*i), playerY+ .1*Math.cos(2*Math.PI/starting_asteroids*i),2*Math.PI/starting_asteroids*i,3));
+            asteroids.add(new asteroid(playerX + .1*Math.sin(2*Math.PI/starting_asteroids*i), playerY+ .1*Math.cos(2*Math.PI/starting_asteroids*i),2*Math.PI/starting_asteroids*i-.5+Math.random(),3));
         }
         buttons.remove(start);
     }
@@ -126,6 +141,10 @@ public class Screen extends JPanel {
             start.updateposition(width/10*5-(int)(width/10*((Math.sin(frames/20.0)/2)+2)/2),height/10*7-(int)(((Math.cos(frames/30.0)/2)+2)/2),(int)((width/10*2)*((Math.sin(frames/20.0)/2)+2)/2),(int)((height/10)*((Math.cos(frames/30.0)/2)+2)/2));
             start.draw(g);
             //new drawablestring(width/10*4,height/10*7,width/10*2,height/10,"Start",true).draw(g);
+            for (int i=0;i<asteroids.size();i++){
+                asteroids.get(i).draw(g,width,height);
+            }
+            new drawablestring(width/10*4,height/40*39,width/5,height/40,"© 2019 Stackunderfl0w").draw(g);
         }
         if (screen==1){
             if(cooldown>0){
@@ -154,12 +173,11 @@ public class Screen extends JPanel {
             playerY=(playerY+playerYVelocity+1)%1;
 
             g.setColor(Color.white);
-            //g.drawLine((int)((width*playerX)+50*Math.sin(playerOrientaion)),(int)((height*playerY)+50*Math.cos(playerOrientaion)),(int)((width*playerX)+15*Math.sin(playerOrientaion+2)),(int)((height*playerY)+15*Math.cos(playerOrientaion+2)));
-            //g.drawLine((int)((width*playerX)+50*Math.sin(playerOrientaion)),(int)((height*playerY)+50*Math.cos(playerOrientaion)),(int)((width*playerX)+15*Math.sin(playerOrientaion-2)),(int)((height*playerY)+15*Math.cos(playerOrientaion-2)));
             g.drawLine((int)((width*playerX)+15*Math.sin(playerOrientaion)),(int)((height*playerY)+15*Math.cos(playerOrientaion)),(int)((width*playerX)+15*Math.sin(playerOrientaion+2.5)),(int)((height*playerY)+15*Math.cos(playerOrientaion+2.5)));
             g.drawLine((int)((width*playerX)+15*Math.sin(playerOrientaion)),(int)((height*playerY)+15*Math.cos(playerOrientaion)),(int)((width*playerX)+15*Math.sin(playerOrientaion-2.5)),(int)((height*playerY)+15*Math.cos(playerOrientaion-2.5)));
             g.drawLine((int)((width*playerX)+5*Math.sin(playerOrientaion+Math.PI)),(int)((height*playerY)+5*Math.cos(playerOrientaion+Math.PI)),(int)((width*playerX)+15*Math.sin(playerOrientaion+2.5)),(int)((height*playerY)+15*Math.cos(playerOrientaion+2.5)));
             g.drawLine((int)((width*playerX)+5*Math.sin(playerOrientaion+Math.PI)),(int)((height*playerY)+5*Math.cos(playerOrientaion+Math.PI)),(int)((width*playerX)+15*Math.sin(playerOrientaion-2.5)),(int)((height*playerY)+15*Math.cos(playerOrientaion-2.5)));
+
             for (int i=0;i<missiles.size();i++){
                 missiles.get(i).draw(g,width,height);
                 if(missiles.get(i).getTime()<1){
@@ -169,15 +187,14 @@ public class Screen extends JPanel {
             }
             for (int i=0;i<asteroids.size();i++){
                 asteroids.get(i).draw(g,width,height);
-                //if(missiles.get(i).getTime()<1){
-                 //   missiles.remove(i);
-                //    i--;
-                //}
             }
             ArrayList<asteroid> addasteroids=new ArrayList<>();
             for (int i=asteroids.size();i-->0;){
-                if (distance(playerX * width, playerY * height, asteroids.get(i).asteroidX * width, asteroids.get(i).asteroidY * height) < 20*asteroids.get(i).size) {
-                    System.exit(0);
+                if(!Main.debug) {
+                    if (distance(playerX * width, playerY * height, asteroids.get(i).asteroidX * width, asteroids.get(i).asteroidY * height) < 20 * asteroids.get(i).size) {
+                        //System.exit(0);
+                        screen=0;
+                    }
                 }
                 for (int o=missiles.size();o-->0;){
                     if(i>=0) {
@@ -187,6 +204,7 @@ public class Screen extends JPanel {
                                     addasteroids.add(new asteroid(asteroids.get(i).asteroidX, asteroids.get(i).asteroidY,2*Math.PI* rand.nextDouble() ,asteroids.get(i).size-1));
                                 }
                             }
+                            score+=10*asteroids.get(i).size;
                             asteroids.remove(i);
                             missiles.remove(o);
                             i--;
@@ -199,30 +217,19 @@ public class Screen extends JPanel {
             if(Main.debug){
                 g.drawLine((int)((width*playerX)+15*Math.sin(playerOrientaion)),(int)((height*playerY)+15*Math.cos(playerOrientaion)),(int)((width*playerX)+50*Math.sin(playerOrientaion)),(int)((height*playerY)+50*Math.cos(playerOrientaion)));
                 g.drawRect((int)(width*playerX-10),(int)(height*playerY-10),20,20);
-                new drawablestring(0,0,100,50,Double.toString(round(playerX,2)),true).draw(g);
-                new drawablestring(0,50,100,50,Double.toString(round(playerY,2)),true).draw(g);
+                new drawablestring(0,0,100,50,Integer.toString((int)(playerX*width)),true).draw(g);
+                new drawablestring(0,50,100,50,Integer.toString((int)(playerY*height)),true).draw(g);
                 new drawablestring(0,100,100,50,Double.toString(round(playerXVelocity*100,2)),true).draw(g);
                 new drawablestring(0,150,100,50,Double.toString(round(playerYVelocity*100,2)),true).draw(g);
                 new drawablestring(0,200,100,50,Double.toString(round(playerOrientaion,2)),true).draw(g);
                 new drawablestring(0,0,50,50,Integer.toString(asteroids.size()),Color.BLUE).draw(g);
+                for(asteroid asteroid:asteroids){
+                    new drawablestring((int)(width*asteroid.asteroidX)+10*asteroid.size,(int)(height*asteroid.asteroidY)-10*asteroid.size-40,50,20,Double.toString(round(width*asteroid.asteroidX,0)),true).draw(g);
+                    new drawablestring((int)(width*asteroid.asteroidX)+10*asteroid.size,(int)(height*asteroid.asteroidY)-10*asteroid.size-20,50,20,Double.toString(round(height*asteroid.asteroidY,0)),true).draw(g);
+                }
             }
-            g.drawLine((int) ((width * .5) + 213.4759939665348 * Math.sin(2.876162296940873)),(int) ((height * .5) + 213.4759939665348 * Math.cos(2.876162296940873)),(int) ((width * .5) + 250.3517525403008 * Math.sin(2.33924696038594)),(int) ((height * .5) + 250.3517525403008 * Math.cos(2.33924696038594)));
-            g.drawLine((int) ((width * .5) + 250.3517525403008 * Math.sin(2.33924696038594)),(int) ((height * .5) + 250.3517525403008 * Math.cos(2.33924696038594)),(int) ((width * .5) + 325.55491088294156 * Math.sin(1.6291913991655185)),(int) ((height * .5) + 325.55491088294156 * Math.cos(1.6291913991655185)));
-            g.drawLine((int) ((width * .5) + 325.55491088294156 * Math.sin(1.6291913991655185)),(int) ((height * .5) + 325.55491088294156 * Math.cos(1.6291913991655185)),(int) ((width * .5) + 343.47052275268106 * Math.sin(1.0993363767339894)),(int) ((height * .5) + 343.47052275268106 * Math.cos(1.0993363767339894)));
-            g.drawLine((int) ((width * .5) + 343.47052275268106 * Math.sin(1.0993363767339894)),(int) ((height * .5) + 343.47052275268106 * Math.cos(1.0993363767339894)),(int) ((width * .5) + 257.84685377176896 * Math.sin(0.29108532346969357)),(int) ((height * .5) + 257.84685377176896 * Math.cos(0.29108532346969357)));
-            g.drawLine((int) ((width * .5) + 257.84685377176896 * Math.sin(0.29108532346969357)),(int) ((height * .5) + 257.84685377176896 * Math.cos(0.29108532346969357)),(int) ((width * .5) + 304.6112276328632 * Math.sin(-0.7250065733293457)),(int) ((height * .5) + 304.6112276328632 * Math.cos(-0.7250065733293457)));
-            g.drawLine((int) ((width * .5) + 304.6112276328632 * Math.sin(-0.7250065733293457)),(int) ((height * .5) + 304.6112276328632 * Math.cos(-0.7250065733293457)),(int) ((width * .5) + 329.24762717444145 * Math.sin(-1.1316003652922073)),(int) ((height * .5) + 329.24762717444145 * Math.cos(-1.1316003652922073)));
-            g.drawLine((int) ((width * .5) + 329.24762717444145 * Math.sin(-1.1316003652922073)),(int) ((height * .5) + 329.24762717444145 * Math.cos(-1.1316003652922073)),(int) ((width * .5) + 289.0830330545188 * Math.sin(-1.6573848302907026)),(int) ((height * .5) + 289.0830330545188 * Math.cos(-1.6573848302907026)));
-            g.drawLine((int) ((width * .5) + 289.0830330545188 * Math.sin(-1.6573848302907026)),(int) ((height * .5) + 289.0830330545188 * Math.cos(-1.6573848302907026)),(int) ((width * .5) + 258.1259382549534 * Math.sin(-2.0985919129864326)),(int) ((height * .5) + 258.1259382549534 * Math.cos(-2.0985919129864326)));
-            g.drawLine((int) ((width * .5) + 258.1259382549534 * Math.sin(-2.0985919129864326)),(int) ((height * .5) + 258.1259382549534 * Math.cos(-2.0985919129864326)),(int) ((width * .5) + 235.47611343828487 * Math.sin(-2.347185724901928)),(int) ((height * .5) + 235.47611343828487 * Math.cos(-2.347185724901928)));
-            g.drawLine((int) ((width * .5) + 235.47611343828487 * Math.sin(-2.347185724901928)),(int) ((height * .5) + 235.47611343828487 * Math.cos(-2.347185724901928)),(int) ((width * .5) + 208.47062143141417 * Math.sin(-2.9874845370243666)),(int) ((height * .5) + 208.47062143141417 * Math.cos(-2.9874845370243666)));
-            g.drawLine((int) ((width * .5) + 208.47062143141417 * Math.sin(-2.9874845370243666)),(int) ((height * .5) + 208.47062143141417 * Math.cos(-2.9874845370243666)),(int) ((width * .5) + 220.9660607423683 * Math.sin(2.908688046947808)),(int) ((height * .5) + 220.9660607423683 * Math.cos(2.908688046947808)));
-
+            new drawablestring(width/6,0,width/6,height/10,Integer.toString(score),customFont,height/20).draw(g);
         }
-        //for(int i=0;i++<10;){
-        //    g.fillOval(rand.nextInt(width),rand.nextInt(height),rand.nextInt(10),rand.nextInt(10));
-        //}
-
     }
     private static double round(double value, int places) {
         if (places < 0) throw new IllegalArgumentException();
@@ -234,6 +241,14 @@ public class Screen extends JPanel {
     }
     public double distance(double x1, double y1, double x2, double y2) {
         return Math.sqrt((y2 - y1) * (y2 - y1) + (x2 - x1) * (x2 - x1));
+    }
+    void drawArr(Graphics g,double[][] arr){
+        for(int i=0;i<arr.length-1;i++){
+            g.drawLine((int)((width*playerX)+arr[i][0]*Math.sin(arr[i][1]+playerOrientaion)),
+                    (int)((height*playerY)+ arr[i][0]*Math.cos(arr[i][1]+playerOrientaion)),
+                    (int)((width*playerX)+ arr[i+1][0]*Math.sin(arr[i+1][1]+playerOrientaion)),
+                    (int)((height*playerY)+ arr[i+1][0]*Math.cos(arr[i+1][1]+playerOrientaion)));
+        }
     }
 }
 class missile{
@@ -255,8 +270,8 @@ class missile{
         missileX=(missileX+missileXVelocity+1)%1;
         missileY=(missileY+missileYVelocity+1)%1;
         time--;
-        g.drawLine((int)((w*missileX)+10*Math.sin(missileOrientaion)),(int)((h*missileY)+10*Math.cos(missileOrientaion)),(int)((w*missileX)+10*Math.sin(missileOrientaion+2.5)),(int)((h*missileY)+10*Math.cos(missileOrientaion+2.5)));
-        g.drawLine((int)((w*missileX)+10*Math.sin(missileOrientaion)),(int)((h*missileY)+10*Math.cos(missileOrientaion)),(int)((w*missileX)+10*Math.sin(missileOrientaion-2.5)),(int)((h*missileY)+10*Math.cos(missileOrientaion-2.5)));
+        g.drawLine((int)((w*missileX)+8*Math.sin(missileOrientaion)),(int)((h*missileY)+10*Math.cos(missileOrientaion)),(int)((w*missileX)+5*Math.sin(missileOrientaion+2.5)),(int)((h*missileY)+5*Math.cos(missileOrientaion+2.5)));
+        g.drawLine((int)((w*missileX)+8*Math.sin(missileOrientaion)),(int)((h*missileY)+10*Math.cos(missileOrientaion)),(int)((w*missileX)+5*Math.sin(missileOrientaion-2.5)),(int)((h*missileY)+5*Math.cos(missileOrientaion-2.5)));
         if (Main.debug){
             g.drawRect((int)(w*missileX)-5,(int)(h*missileY)-5,10,10);
             g.drawLine((int)((w*missileX)+15*Math.sin(missileOrientaion)),(int)((h*missileY)+15*Math.cos(missileOrientaion)),(int)((w*missileX)+50*Math.sin(missileOrientaion)),(int)((h*missileY)+50*Math.cos(missileOrientaion)));
@@ -274,6 +289,7 @@ class asteroid{
     double asteroidOrientaion;
     int size;
     double ofset;
+    int style;
     Random rand=new Random();
     asteroid(double x, double y, double direction,int s){
 
@@ -284,32 +300,39 @@ class asteroid{
         asteroidOrientaion=direction;
         size=s;
         ofset=rand.nextDouble()*2*Math.PI;
+        //style=rand.nextInt(4);
+        style=(int)(Math.random()*4);
     }
     void draw(Graphics g,int w, int h){
         asteroidX=(asteroidX+asteroidXVelocity+1)%1;
         asteroidY=(asteroidY+asteroidYVelocity+1)%1;
-        draw_circular(g,(int)(w*asteroidX),(int)(h*asteroidY),15*size,6+size);
-        g.drawLine((int)((w*asteroidX)+15*Math.sin(asteroidOrientaion)),(int)((h*asteroidY)+15*Math.cos(asteroidOrientaion)),(int)((w*asteroidX)+15*Math.sin(asteroidOrientaion+(1*Math.PI/3))),(int)((h*asteroidY)+15*Math.cos(asteroidOrientaion+(1*Math.PI/3))));
-
-
-        /*g.drawLine((int)((w*asteroidX)+15*Math.sin(asteroidOrientaion)),(int)((h*asteroidY)+15*Math.cos(asteroidOrientaion)),(int)((w*asteroidX)+15*Math.sin(asteroidOrientaion+(1*Math.PI/3))),(int)((h*asteroidY)+15*Math.cos(asteroidOrientaion+(1*Math.PI/3))));
-        g.drawLine((int)((w*asteroidX)+15*Math.sin(asteroidOrientaion+(1*Math.PI/3))),(int)((h*asteroidY)+15*Math.cos(asteroidOrientaion+(1*Math.PI/3))),(int)((w*asteroidX)+15*Math.sin(asteroidOrientaion+(2*Math.PI/3))),(int)((h*asteroidY)+15*Math.cos(asteroidOrientaion+(2*Math.PI/3))));
-        g.drawLine((int)((w*asteroidX)+15*Math.sin(asteroidOrientaion+(2*Math.PI/3))),(int)((h*asteroidY)+15*Math.cos(asteroidOrientaion+(2*Math.PI/3))),(int)((w*asteroidX)+15*Math.sin(asteroidOrientaion+(3*Math.PI/3))),(int)((h*asteroidY)+15*Math.cos(asteroidOrientaion+(3*Math.PI/3))));
-        g.drawLine((int)((w*asteroidX)+15*Math.sin(asteroidOrientaion+(3*Math.PI/3))),(int)((h*asteroidY)+15*Math.cos(asteroidOrientaion+(3*Math.PI/3))),(int)((w*asteroidX)+15*Math.sin(asteroidOrientaion+(4*Math.PI/3))),(int)((h*asteroidY)+15*Math.cos(asteroidOrientaion+(4*Math.PI/3))));
-        g.drawLine((int)((w*asteroidX)+15*Math.sin(asteroidOrientaion+(4*Math.PI/3))),(int)((h*asteroidY)+15*Math.cos(asteroidOrientaion+(4*Math.PI/3))),(int)((w*asteroidX)+15*Math.sin(asteroidOrientaion+(5*Math.PI/3))),(int)((h*asteroidY)+15*Math.cos(asteroidOrientaion+(5*Math.PI/3))));
-        g.drawLine((int)((w*asteroidX)+15*Math.sin(asteroidOrientaion+(5*Math.PI/3))),(int)((h*asteroidY)+15*Math.cos(asteroidOrientaion+(5*Math.PI/3))),(int)((w*asteroidX)+15*Math.sin(asteroidOrientaion+(6*Math.PI/3))),(int)((h*asteroidY)+15*Math.cos(asteroidOrientaion+(6*Math.PI/3))));
-        */
+        //draw_circular(g,(int)(w*asteroidX),(int)(h*asteroidY),15*size,6+size);
         if (Main.debug){
             g.drawRect((int)(w*asteroidX)-10*size,(int)(h*asteroidY)-10*size,20*size,20*size);
             g.drawLine((int)((w*asteroidX)+15*Math.sin(asteroidOrientaion)),(int)((h*asteroidY)+15*Math.cos(asteroidOrientaion)),(int)((w*asteroidX)+50*Math.sin(asteroidOrientaion)),(int)((h*asteroidY)+50*Math.cos(asteroidOrientaion)));
         }
-    }
-    int getS(){
-        return size;
+        switch (style){
+            case 0:drawArr(g,w,h,new double[][]{{7.0, 2.82}, {12.0, 2.75}, {11.0, 2.04}, {11.0, 1.07}, {10.0, 0.85}, {2.0, 0.49}, {12.0, 0.11}, {13.0, -0.49}, {9.0, -0.68}, {12.0, -1.45}, {12.0, -2.31}, {13.0, -2.96}, {7.0, 2.87}});
+                break;
+            case 1:drawArr(g,w,h,new double[][]{{9.0, 3.02}, {13.0, 2.59}, {12.0, 1.97}, {6.0, 1.98}, {11.0, 1.26}, {12.0, 0.33}, {8.0, -0.44}, {12.0, -0.57}, {11.0, -1.26}, {8.0, -1.75}, {13.0, -2.24}, {13.0, -2.86}, {9.0, 3.02}});
+                break;
+            case 2:drawArr(g,w,h,new double[][]{{4.0, 2.53}, {12.0, 2.18}, {11.0, 1.32}, {6.0, 1.08}, {11.0, 0.81}, {11.0, -0.19}, {11.0, -0.92}, {10.0, -1.9}, {11.0, -2.41}, {12.0, 3.07}, {11.0, 2.65}, {4.0, 2.62}});
+                break;
+            case 3:drawArr(g,w,h,new double[][]{{11.0, -2.85}, {11.0, 2.58}, {11.0, 1.94}, {11.0, 0.92}, {11.0, 0.29}, {11.0, -0.61}, {11.0, -1.26}, {11.0, -2.23}, {11.0, -2.87}});
+                break;
+        }
     }
     void draw_circular(Graphics g,int x,int y,int d, int s){
         for (int i=0;i<s;i++){
             g.drawLine((int)((x)+d*Math.sin((2*Math.PI/s*i)+ofset)),(int)((y)+d*Math.cos((2*Math.PI/s*i)+ofset)),(int)((x)+d*Math.sin((2*Math.PI/s*(i+1)+ofset))),(int)((y)+d*Math.cos((2*Math.PI/s*(i+1)+ofset))));
+        }
+    }
+    void drawArr(Graphics g,int w,int h,double[][] arr){
+        for(int i=0;i<arr.length-1;i++){
+            g.drawLine((int)((w*asteroidX)+arr[i][0]*size*Math.sin(arr[i][1]+ofset)),
+                    (int)((h*asteroidY)+ arr[i][0]*size*Math.cos(arr[i][1]+ofset)),
+                    (int)((w*asteroidX)+ arr[i+1][0]*size*Math.sin(arr[i+1][1]+ofset)),
+                    (int)((h*asteroidY)+ arr[i+1][0]*size*Math.cos(arr[i+1][1]+ofset)));
         }
     }
 }
