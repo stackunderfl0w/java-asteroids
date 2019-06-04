@@ -16,8 +16,8 @@ import java.util.Random;
 public class Screen extends JPanel {
     private Graphics g;
     private int scale = 1;
-    private int width = 1280 * scale;
-    private int height = 720 * scale;
+    private int width = 900 * scale;
+    private int height = 900 * scale;
     private int screen=0;
     double playerX;
     double playerY;
@@ -37,6 +37,7 @@ public class Screen extends JPanel {
     private int cooldown;
     int starting_asteroids=3;
     private int score;
+    private int highscore;
     Font customFont;
 
     Screen(){
@@ -73,7 +74,10 @@ public class Screen extends JPanel {
         key.put(KeyEvent.VK_D,false);
         key.put(KeyEvent.VK_SPACE,false);
         for( int i =0;i++<3;) {
-            asteroids.add(new asteroid(rand.nextInt(width), rand.nextInt(width), rand.nextDouble() * Math.PI, 3));
+            asteroids.add(new asteroid(rand.nextDouble(), rand.nextDouble(), rand.nextDouble() * Math.PI, 3));
+            asteroids.add(new asteroid(rand.nextDouble(), rand.nextDouble(), rand.nextDouble() * Math.PI, 2));
+            asteroids.add(new asteroid(rand.nextDouble(), rand.nextDouble(), rand.nextDouble() * Math.PI, 1));
+            asteroids.add(new asteroid(rand.nextDouble(), rand.nextDouble(), rand.nextDouble() * Math.PI, 1));
         }
         try {
             //create the font to use. Specify the size!
@@ -124,29 +128,43 @@ public class Screen extends JPanel {
         height=getHeight();
         if (start.wasclicked()){
             screen=1;
+            asteroids.clear();
             startgame();
         }
-        if(screen==0){
-            new drawablestring(width/10,height/20,width/10*8,height/10*2,"Asteroids").draw(g);
-            System.arraycopy(stars, 0, stars, 1, 39);
-            int x=20+rand.nextInt(80);
-            stars[0] =new int[]{rand.nextInt(width),rand.nextInt(height),x,0,x/2};
-            for(int[] star: stars){
-                if (star[2] > 0) {
-                    g.fillOval(star[0], star[1], (int)(star[3]*Math.sin(star[3]/100.0))/2,(int)(star[3]*Math.sin(star[3]/100.0))/2);
-                    star[2]--;
-                    star[3]++;
-                }
+        g.setColor(Color.white);
+        new drawablestring(width/10,0,width/6,height/10,Integer.toString(score),customFont,height/20).draw(g);
+
+        new drawablestring(width-width/4,0,width/6,height/10,Integer.toString(highscore),customFont,height/20).draw(g);
+        System.arraycopy(stars, 0, stars, 1, 39);
+        int x=20+rand.nextInt(80);
+        stars[0] =new int[]{rand.nextInt(width),rand.nextInt(height),x,0,x/2};
+        for(int[] star: stars){
+            if (star[2] > 0) {
+                g.fillOval(star[0], star[1], (int)(star[3]*Math.sin(star[3]/100.0))/2,(int)(star[3]*Math.sin(star[3]/100.0))/2);
+                star[2]--;
+                star[3]++;
             }
+        }
+        if(screen==0){
+            new drawablestring(width/10,height/20,width/10*8,height/10*2,"Asteroids",customFont,256).draw(g);
+
             start.updateposition(width/10*5-(int)(width/10*((Math.sin(frames/20.0)/2)+2)/2),height/10*7-(int)(((Math.cos(frames/30.0)/2)+2)/2),(int)((width/10*2)*((Math.sin(frames/20.0)/2)+2)/2),(int)((height/10)*((Math.cos(frames/30.0)/2)+2)/2));
             start.draw(g);
             //new drawablestring(width/10*4,height/10*7,width/10*2,height/10,"Start",true).draw(g);
             for (int i=0;i<asteroids.size();i++){
                 asteroids.get(i).draw(g,width,height);
             }
-            new drawablestring(width/10*4,height/40*39,width/5,height/40,"© 2019 Stackunderfl0w").draw(g);
+            new drawablestring(width/10*4,height/40*39,width/5,height/40,"© 2019 Stackunderfl0w",customFont,48).draw(g);
+            if(score!=0){
+                new drawablestring(width/3,height/3,width/3,height/3,Integer.toString(score),customFont,80).draw(g);
+            }
         }
         if (screen==1){
+            g.setColor(Color.white);
+            if(asteroids.size()==0){
+                startgame();
+                starting_asteroids++;
+            }
             if(cooldown>0){
                 cooldown--;
             }
@@ -193,7 +211,11 @@ public class Screen extends JPanel {
                 if(!Main.debug) {
                     if (distance(playerX * width, playerY * height, asteroids.get(i).asteroidX * width, asteroids.get(i).asteroidY * height) < 20 * asteroids.get(i).size) {
                         //System.exit(0);
+                        highscore=score;
+                        score=0;
                         screen=0;
+                        buttons.add(start);
+                        missiles.clear();
                     }
                 }
                 for (int o=missiles.size();o-->0;){
@@ -214,6 +236,10 @@ public class Screen extends JPanel {
                 }
             }
             asteroids.addAll(addasteroids);
+            if(key.get(KeyEvent.VK_W)) {
+                g.drawLine((int) ((width * playerX) + 9.0 * Math.sin(-2.55 + playerOrientaion)), (int) ((height * playerY) + 9.0 * Math.cos(-2.55 + playerOrientaion)), (int) ((width * playerX) + 15.0 * Math.sin(3.12 + playerOrientaion)), (int) ((height * playerY) + 15.0 * Math.cos(3.12 + playerOrientaion)));
+                g.drawLine((int) ((width * playerX) + 15.0 * Math.sin(3.14 + playerOrientaion)), (int) ((height * playerY) + 15.0 * Math.cos(3.14 + playerOrientaion)), (int) ((width * playerX) + 9.0 * Math.sin(2.55 + playerOrientaion)), (int) ((height * playerY) + 9.0 * Math.cos(2.55 + playerOrientaion)));
+            }
             if(Main.debug){
                 g.drawLine((int)((width*playerX)+15*Math.sin(playerOrientaion)),(int)((height*playerY)+15*Math.cos(playerOrientaion)),(int)((width*playerX)+50*Math.sin(playerOrientaion)),(int)((height*playerY)+50*Math.cos(playerOrientaion)));
                 g.drawRect((int)(width*playerX-10),(int)(height*playerY-10),20,20);
@@ -228,7 +254,6 @@ public class Screen extends JPanel {
                     new drawablestring((int)(width*asteroid.asteroidX)+10*asteroid.size,(int)(height*asteroid.asteroidY)-10*asteroid.size-20,50,20,Double.toString(round(height*asteroid.asteroidY,0)),true).draw(g);
                 }
             }
-            new drawablestring(width/6,0,width/6,height/10,Integer.toString(score),customFont,height/20).draw(g);
         }
     }
     private static double round(double value, int places) {
