@@ -1,13 +1,11 @@
 import javax.swing.*;
 import java.awt.*;
-import javax.swing.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Random;
 
@@ -28,7 +26,7 @@ public class Screen extends JPanel {
     public HashMap<Integer, Boolean> key=new HashMap<>();
     Random rand = new Random();
     private int[][] stars=new int[120][];
-    private static drawablebutton start;
+    private static roundeddrawablebutton start;
     private static ArrayList<uielement> buttons=new ArrayList<>();
     uielement elementinfocus;
     private int x_location,y_location;
@@ -66,7 +64,7 @@ public class Screen extends JPanel {
         for(int i=0; i<stars.length;i++){
             stars[i] =new int[]{rand.nextInt(width),rand.nextInt(height),20+rand.nextInt(80)-i,0,0};
         }
-        start=new drawablebutton(width/10*4,height/10*7,width/10*2,height/10,"Start",true);
+        start=new roundeddrawablebutton(width/10*4,height/10*7,width/10*2,height/10,"Start",true);
         buttons.add(start);
         key.put(KeyEvent.VK_A,false);
         key.put(KeyEvent.VK_W,false);

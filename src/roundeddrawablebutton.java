@@ -1,7 +1,7 @@
 import java.awt.*;
 import java.awt.event.KeyEvent;
 
-public class drawablebutton extends uielement{
+public class roundeddrawablebutton extends uielement{
     private int width;
     private int height;
     private int x_location;
@@ -12,7 +12,7 @@ public class drawablebutton extends uielement{
     private boolean clicked;
     private int xofset;
     private int yofset;
-    drawablebutton(int x, int y,int w, int h,int xoff,int yoff, String s,Boolean bounds){
+    roundeddrawablebutton(int x, int y, int w, int h, int xoff, int yoff, String s, Boolean bounds){
         x_location=x;
         y_location=y;
         width=w;
@@ -23,7 +23,7 @@ public class drawablebutton extends uielement{
         xofset=xoff;
         yofset=yoff;
     }
-    drawablebutton(int x, int y,int w, int h, String s,Boolean bounds){
+    roundeddrawablebutton(int x, int y, int w, int h, String s, Boolean bounds){
         x_location=x;
         y_location=y;
         width=w;

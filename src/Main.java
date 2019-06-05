@@ -26,7 +26,7 @@ public class Main {
                 //long starttime=System.nanoTime();
                 if (System.nanoTime()-last_fps_update>1000000000/2) {
                     last_fps_update=System.nanoTime();
-                    f.setTitle("Stackunderfl0w java asteroids (fps, " + fps + ", " + round(100 * fps / 60, 1) + "%)"+screen.frames*2);
+                    f.setTitle("Stackunderfl0w java asteroids (fps, " + fps + ", " + round(100 * fps / 60, 1) + "%)");
                 }
                 System.arraycopy(last_frame, 0, last_frame, 1, 59);
                 last_frame[0] = System.nanoTime();
