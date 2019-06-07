@@ -117,7 +117,7 @@ public class Screen extends JPanel {
         playerX=.5;
         playerY=.5;
         for(int i=0; i<starting_asteroids; i++) {
-            asteroids.add(new asteroid(playerX + .1*Math.sin(2*Math.PI/starting_asteroids*i), playerY+ .1*Math.cos(2*Math.PI/starting_asteroids*i),2*Math.PI/starting_asteroids*i-.5+Math.random(),3));
+            asteroids.add(new asteroid(playerX + 100.0/width*Math.sin(2*Math.PI/starting_asteroids*i), playerY+ 100.0/height*Math.cos(2*Math.PI/starting_asteroids*i),2*Math.PI/starting_asteroids*i-.5+Math.random(),3));
         }
         buttons.remove(start);
     }
