@@ -116,6 +116,10 @@ public class Screen extends JPanel {
         asteroids=new ArrayList<>();
         playerX=.5;
         playerY=.5;
+        playerXVelocity=0;
+        playerYVelocity=0;
+        playerOrientaion=0;
+        score=0;
         for(int i=0; i<starting_asteroids; i++) {
             asteroids.add(new asteroid(playerX + 100.0/width*Math.sin(2*Math.PI/starting_asteroids*i), playerY+ 100.0/height*Math.cos(2*Math.PI/starting_asteroids*i),2*Math.PI/starting_asteroids*i-.5+Math.random(),3));
         }
@@ -209,8 +213,9 @@ public class Screen extends JPanel {
                 if(!Main.debug) {
                     if (distance(playerX * width, playerY * height, asteroids.get(i).asteroidX * width, asteroids.get(i).asteroidY * height) < 20 * asteroids.get(i).size) {
                         //System.exit(0);
-                        highscore=score;
-                        score=0;
+                        if (score>highscore){
+                            highscore=score;
+                        }
                         screen=0;
                         buttons.add(start);
                         missiles.clear();
