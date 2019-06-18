@@ -85,6 +85,7 @@ public class Screen extends JPanel {
             ge.registerFont(customFont);
         } catch (Exception e) {
             e.printStackTrace();
+            customFont=new Font("Arial", Font.BOLD, 96);
         }
 
     }
