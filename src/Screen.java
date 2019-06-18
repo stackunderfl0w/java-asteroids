@@ -217,6 +217,7 @@ public class Screen extends JPanel {
                         if (score>highscore){
                             highscore=score;
                         }
+                        starting_asteroids=3;
                         screen=0;
                         buttons.add(start);
                         missiles.clear();
